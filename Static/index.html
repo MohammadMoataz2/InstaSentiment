@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>InstaSentiment</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--Stylesheet-->
+    <style media="screen">
+        *,
+        *:before,
+        *:after {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #080710;
+        }
+
+        .background {
+            width: 430px;
+            height: 520px;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            left: 50%;
+            top: 50%;
+        }
+
+        .background .shape {
+            height: 200px;
+            width: 200px;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .shape:first-child {
+            background: linear-gradient(
+                    #1845ad,
+                    #23a2f6
+            );
+            left: -80px;
+            top: -80px;
+        }
+
+        .shape:last-child {
+            background: linear-gradient(
+                    to right,
+                    #ff512f,
+                    #f09819
+            );
+            right: -30px;
+            bottom: -80px;
+        }
+
+        form {
+            height: 520px;
+            width: 400px;
+            background-color: rgba(255, 255, 255, 0.13);
+            position: absolute;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
+            padding: 50px 35px;
+        }
+
+        form * {
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            outline: none;
+            border: none;
+        }
+
+        form h3 {
+            font-size: 32px;
+            font-weight: 500;
+            line-height: 42px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        input {
+            display: block;
+            height: 50px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.07);
+            border-radius: 3px;
+            padding: 0 10px;
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        ::placeholder {
+            color: #e5e5e5;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .preview-button,
+        .download-button {
+            background-color: #23a2f6;
+            color: #ffffff;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .csv-container {
+            max-height: 300px;
+            overflow: auto;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+       /* Updated CSS for the table */
+.csv-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.csv-table th, .csv-table td {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px;
+    text-align: left;
+    font-size: 16px; /* Increased font size */
+    font-weight: bold; /* Added font weight */
+}
+
+.csv-table th {
+    background-color: #23a2f6; /* Added background color for table header */
+    color: #ffffff; /* Added font color for table header */
+}
+
+.csv-table td {
+    background-color: rgba(255, 255, 255, 0.1); /* Added background color for table cells */
+}
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding-top: 200px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 10px;
+            position: absolute;
+            top: 600px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .button-container button {
+            display: block;
+            margin-top: 10px;
+        }
+
+   
+    </style>
+</head>
+<body>
+<div class="background">
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+<form id="scrapeForm">
+    <h3>InstaSentiment</h3>
+
+    <label for="url">Instagram Post URL:</label>
+    <input type="text" placeholder="Enter URL" id="url" required>
+
+    <button type="button" class="preview-button" onclick="scrape(event)">Scrape</button>
+
+    <div class="result" id="result" style="display: none;">
+        <p>Positive: <span id="positive"></span></p>
+        <p>Negative: <span id="negative"></span></p>
+    </div>
+
+</form>
+
+<div class="button-container">
+    <button class="preview-button" id="previewButton" onclick="expandTable()" style="display: none;">Preview CSV</button>
+    <a class="btn btn-success btn-scrape" id="downloadLink" style="display: none;">Download CSV</a>
+</div>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div id="csvContainerModal" style="max-height: 80vh; overflow: auto;"></div>
+    </div>
+</div>
+
+<!-- Loading screen -->
+<div id="loading" class="loading">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p>Loading...</p>
+</div>
+<script>
+    async function scrape(event) {
+        event.preventDefault(); // Prevent default form submission behavior
+
+        const url = document.getElementById("url").value;
+
+        // Show loading screen
+        document.getElementById("loading").style.display = "block";
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/scarper/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    url,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const data = await response.json();
+            document.getElementById("result").style.display = "block";
+            document.getElementById("positive").innerText = data.positive;
+            document.getElementById("negative").innerText = data.negative;
+
+            if (data.scraping_json) {
+                document.getElementById("csvContainerModal").style.display = "block";
+                document.getElementById("downloadLink").style.display = "block";
+                document.getElementById("downloadLink").setAttribute("href", data.scraping_json);
+                fetchCSV(data.scraping_json);
+                document.getElementById("previewButton").style.display = "block";
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            // Hide loading screen
+            document.getElementById("loading").style.display = "none";
+        }
+    }
+
+    function fetchCSV(csvUrl) {
+        fetch(csvUrl)
+            .then(response => response.text())
+            .then(csvData => {
+                const csvContainerModal = document.getElementById("csvContainerModal");
+                const table = document.createElement('table');
+                table.classList.add('csv-table');
+                const rows = csvData.split('\n');
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    const columns = row.split(',');
+                    columns.forEach(column => {
+                        const td = document.createElement('td');
+                        td.textContent = column;
+                        tr.appendChild(td);
+                    });
+                    table.appendChild(tr);
+                });
+                csvContainerModal.appendChild(table);
+            })
+            .catch(error => console.error('Error fetching CSV:', error));
+    }
+
+    function expandTable() {
+        const modal = document.getElementById("myModal");
+        modal.style.display = "block";
+        // displayCSVDataModal(); // No longer needed
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+
+    // function displayCSVDataModal() {
+    //     // Not needed anymore
+    // }
+</script>
+
+</body>
+</html>
